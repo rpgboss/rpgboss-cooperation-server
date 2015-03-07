@@ -23,13 +23,23 @@ class Commander implements MessageComponentInterface {
     public function __construct() {
         $this->clients = new \SplObjectStorage;
         $this->config = Config::Load();
+    }
 
+    protected function getUser($value)
+    {
         $this->db = new Mysql(
             $this->config['mysql']['host'],
             $this->config['mysql']['username'],
             $this->config['mysql']['password'],
             $this->config['mysql']['database']
         );
+
+        $result = $this->db->fetchRow('SELECT * FROM user WHERE login_hash = :login_hash', array('login_hash' => $value->value));
+
+        $this->db->close();
+        $this->db = null;
+
+        return $result;
     }
 
     protected function sendToAll($from, $message)
@@ -65,7 +75,7 @@ class Commander implements MessageComponentInterface {
 
                     print $from->mode;
 
-                    $result = $this->db->fetchRow('SELECT * FROM user WHERE login_hash = :login_hash', array('login_hash' => $value->value));
+                    $result = $this->getUser($value);
                     if($result!=false) {
                         print " have user\n";
                         $from->user = $result;
@@ -88,6 +98,8 @@ class Commander implements MessageComponentInterface {
                     $from->send("user;".$from->mode.";".json_encode(array('value'=>$this->clients->count())));
                     break;
             }
+
+
 
         }
 
