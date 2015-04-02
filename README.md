@@ -5,5 +5,5 @@ to improve game creation with a team.
 
 ### Components
 
-> Chat (used in the asset server)
+> Chat (used in the asset server)<br>
 > Connection between editor and asset server to import assets
